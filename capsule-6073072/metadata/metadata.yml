@@ -1,0 +1,16 @@
+metadata_version: 1
+name: 'CP-AGCN: Pytorch-based Attention Informed Graph Convolutional Networks for
+  Identifying Infants at Risk of Cerebral Palsy'
+description: |-
+  We design a Pytorch-based attention-informed graph convolutional network to
+  early identify infants at risk of CP from skeletal data extracted from RGB videos. W
+authors:
+- name: Haozheng Zhang
+  affiliations:
+  - name: Durham University
+- name: Edmond S.L. Ho
+  affiliations:
+  - name: Northumbria University
+- name: Hubert P.H. Shum
+  affiliations:
+  - name: Durham University

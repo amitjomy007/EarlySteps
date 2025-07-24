@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -ex
+cd torchlight; python setup.py install; cd ..
+# This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
+python -u start.py "$@"
