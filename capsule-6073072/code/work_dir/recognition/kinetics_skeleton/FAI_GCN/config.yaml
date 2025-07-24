@@ -1,8 +1,8 @@
-# command line: main.py recognition -c ../data/02/train.yaml
+# command line: main.py recognition -c ../data/09/train.yaml
 
 base_lr: 0.0001
 batch_size: 1
-config: ../data/02/train.yaml
+config: ../data/09/train.yaml
 debug: false
 device:
 - 0
@@ -42,11 +42,11 @@ step:
 - 500
 test_batch_size: 1
 test_feeder_args:
-    data_path: ../data/02/kinetics-skeleton/val_data.npy
-    label_path: ../data/02/kinetics-skeleton/val_label.pkl
+    data_path: ../data/09/kinetics-skeleton/val_data.npy
+    label_path: ../data/09/kinetics-skeleton/val_label.pkl
 train_feeder_args:
-    data_path: ../data/02/kinetics-skeleton/train_data.npy
-    label_path: ../data/02/kinetics-skeleton/train_label.pkl
+    data_path: ../data/09/kinetics-skeleton/train_data.npy
+    label_path: ../data/09/kinetics-skeleton/train_label.pkl
     random_choose: true
     random_move: true
     window_size: 300
