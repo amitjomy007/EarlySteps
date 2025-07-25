@@ -17,7 +17,7 @@ import Cookies from "js-cookie";
 const auth = getAuth(app);
 
 const Register = () => {
-  const check = Cookies.get("token");
+  const check = Cookies.get("userName");
   if (check) {
     window.location.href = "/";
   }

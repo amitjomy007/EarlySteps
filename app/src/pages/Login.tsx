@@ -16,7 +16,7 @@ import Cookies from "js-cookie";
 const auth = getAuth(app);
 
 const Login = () => {
-    const check = Cookies.get('token')
+    const check = Cookies.get('userName');
     if(check){
       window.location.href = '/'}
   const [email, setEmail] = useState("");
