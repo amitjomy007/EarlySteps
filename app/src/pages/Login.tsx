@@ -1,66 +1,162 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+
+import { app } from "../firebase/firebase";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import Cookies from "js-cookie";
+const auth = getAuth(app);
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+    const check = Cookies.get('token')
+    if(check){
+      window.location.href = '/'}
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const getFriendlyErrorMessage = (errorCode) => {
+    switch (errorCode) {
+      case "auth/user-not-found":
+        return "No account found with this email. Please check your email or create an account.";
+      case "auth/wrong-password":
+        return "Incorrect password. Please try again.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Please contact support.";
+      case "auth/too-many-requests":
+        return "Too many failed attempts. Please try again later.";
+      case "auth/network-request-failed":
+        return "Network error. Please check your connection and try again.";
+      default:
+        return "Login failed. Please check your credentials and try again.";
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login attempted with:', { email, password });
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      //expiry 1 day
+      Cookies.set("token", userCredential.user.email, { expires: 1 })
+      Cookies.set("userName", userCredential.user.displayName, { expires: 1 })
+      navigate("/");
+    } catch (firebaseError) {
+      const friendlyMessage = getFriendlyErrorMessage(firebaseError.code);
+      setError(friendlyMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-light px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold text-brand-blue">EarlySteps</h1>
-            <p className="text-muted-foreground">Early Detection for a Brighter Future</p>
+    <div className="min-h-screen flex items-center justify-center bg-brand-light px-4 py-8">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-2">
+          <div className="mb-6">
+            <h1 className="text-4xl font-bold text-brand-blue mb-2">EarlySteps</h1>
+            <p className="text-muted-foreground text-sm">
+              Early Detection for a Brighter Future
+            </p>
           </div>
-          <CardTitle>Welcome Back</CardTitle>
+          <CardTitle className="text-2xl">Welcome Back</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Sign in to continue your journey
+          </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <Alert variant="destructive" className="border-red-200">
+                <AlertDescription className="text-sm">{error}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email Address
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10 h-11"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <Label htmlFor="password" className="text-sm font-medium">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 pr-10 h-11"
+                  required
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={isLoading}
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </button>
+              </div>
             </div>
-            <Button 
-              type="submit" 
-              className="w-full bg-brand-accent hover:bg-brand-accent/90 text-brand-dark font-semibold"
+
+            <Button
+              type="submit"
+              className="w-full bg-brand-accent hover:bg-brand-accent/90 text-brand-dark font-semibold h-11 text-base"
+              disabled={isLoading}
             >
-              Login
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
-          <p className="text-center mt-4 text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <a href="/register" className="text-brand-teal hover:text-brand-accent transition-colors font-medium">
-              Register
-            </a>
-          </p>
+
+          <div className="text-center mt-6 pt-4 border-t">
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <button
+                onClick={() => navigate("/register")}
+                className="text-brand-teal hover:text-brand-accent transition-colors font-medium hover:underline"
+              >
+                Create one here
+              </button>
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
