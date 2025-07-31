@@ -171,7 +171,7 @@ const Index = () => {
               <CardContent className="pt-6">
                 <div className="w-20 h-20 bg-brand-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <img
-                    src="./../../public/aswin.jpeg"
+                    src="/aswin.jpeg"
                     alt="Aswin Tony Joseph"
                     className="w-full h-full rounded-full object-cover object-center"
                   />
@@ -189,7 +189,7 @@ const Index = () => {
               <CardContent className="pt-6">
                 <div className="w-20 h-20 bg-brand-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <img
-                    src="./../../public/meenakshi.jpg"
+                    src="/meenakshi.jpg"
                     alt="Meenakshi N"
                     className="w-full h-full rounded-full object-cover object-center"
                   />
@@ -207,7 +207,7 @@ const Index = () => {
               <CardContent className="pt-6">
                 <div className="w-20 h-20 bg-brand-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <img
-                    src="./../../public/chitraksh.jpg"
+                    src="/chitraksh.jpg"
                     alt="Chitraksh Vasantati"
                     className="w-full h-full rounded-full object-cover object-center"
                   />
@@ -225,7 +225,7 @@ const Index = () => {
               <CardContent className="pt-6">
                 <div className="w-20 h-20 bg-brand-blue/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <img
-                    src="./../../public/amit.jpg"
+                    src="/amit.jpg"
                     alt="Amit Jomy"
                     className="w-full h-full rounded-full object-cover object-center"
                   />
