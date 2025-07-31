@@ -80,7 +80,7 @@ const simulatePredictionAPI = async (
 
 // Marketing Section Component
 const TechnologyShowcase = () => (
-  <div className="w-full max-w-6xl mx-auto mb-12">
+  <div className="w-full max-w-6xl mx-auto mb-12 mt-16">
     <div className="text-center mb-8">
       <h2 className="text-3xl font-bold text-brand-dark dark:text-white mb-4 flex items-center justify-center gap-3">
         <Sparkles className="w-8 h-8 text-brand-accent animate-pulse" />
@@ -208,7 +208,7 @@ const VideoUpload = ({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto mb-16">
+    <Card className="w-full max-w-2xl mx-auto ">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-brand-dark">
           <Upload className="w-6 h-6" />
@@ -293,6 +293,7 @@ const PredictionProgress = ({
   progress: number;
   stage: string;
 }) => (
+    <>
   <Card className="w-full max-w-2xl mx-auto">
     <CardHeader>
       <CardTitle className="flex items-center gap-2 text-brand-dark">
@@ -328,6 +329,8 @@ const PredictionProgress = ({
       </div>
     </CardContent>
   </Card>
+  <TechnologyShowcase/>
+  </>
 );
 
 const ResultsDisplay = ({ results }: { results }) => {
@@ -756,9 +759,15 @@ export default function AnalyzePage() {
             </>
           )}
 
-          {step === "uploading" && <UploadProgress progress={uploadProgress} />}
+          {step === "uploading" && (
+            <>
+              <UploadProgress progress={uploadProgress} />
+              <TechnologyShowcase />
+            </>
+          )}
 
           {step === "uploaded" && (
+            <>
             <Card className="w-full max-w-2xl mx-auto">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-brand-dark">
@@ -788,6 +797,8 @@ export default function AnalyzePage() {
                 </div>
               </CardContent>
             </Card>
+            <TechnologyShowcase/>
+            </>
           )}
 
           {step === "predicting" && (
