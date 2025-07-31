@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import Cookies from "js-cookie";
+import { db } from "@/firebase/firebase";
+import { collection, addDoc } from "firebase/firestore";
+
 import {
   Upload,
   Play,
@@ -22,7 +26,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
+let id = undefined;
 // API Simulation Functions
 const simulateUploadAPI = async (
   file: File,
@@ -42,6 +46,31 @@ const simulateUploadAPI = async (
   });
 };
 
+const uploadResultsToDb = async (
+  hinesFactor: number,
+  gmaScore: number,
+  riskFactor: number,
+  combinedScore: number
+) => {
+  try {
+    const data = {
+      userEmail: Cookies.get("token"),
+      userName: Cookies.get("userName"),
+      hinesFactor: hinesFactor,
+      gmaScore: gmaScore,
+      riskFactor: riskFactor,
+      combinedScore: combinedScore,
+      date: new Date(),
+      "HealthCare Provider": "Early Steps AI",
+    };
+    const docRef = await addDoc(collection(db, "results"), data);
+    console.log("Document written with ID: ", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    return null;
+  }
+};
+
 const simulatePredictionAPI = async (
   videoId: string,
   onProgress: (progress: number, stage: string) => void
@@ -57,25 +86,39 @@ const simulatePredictionAPI = async (
     { progress: 100, stage: "Analysis complete!" },
   ];
 
-  return new Promise((resolve) => {
-    let currentStage = 0;
-    const interval = setInterval(() => {
-      if (currentStage < stages.length) {
-        onProgress(stages[currentStage].progress, stages[currentStage].stage);
-        currentStage++;
-      } else {
-        clearInterval(interval);
-        setTimeout(() => {
-          resolve({
-            hinesFactor: Math.random() * 100,
-            gmaScore: Math.random() * 20,
-            riskFactor: Math.random() * 100,
-            combinedScore: Math.random() * 100,
-          });
-        }, 500);
-      }
-    }, 800);
-  });
+  // Simulate progress updates using async/await
+  for (let i = 0; i < stages.length; i++) {
+    onProgress(stages[i].progress, stages[i].stage);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+  }
+
+  // Generate results and upload to database
+  const hinesFactor = Math.random() * 100;
+  const gmaScore = Math.random() * 20;
+  const riskFactor = Math.random() * 100;
+  const combinedScore = Math.random() * 100;
+
+  try {
+    id = await uploadResultsToDb(
+      hinesFactor,
+      gmaScore,
+      riskFactor,
+      combinedScore
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    return {
+      id,
+      hinesFactor,
+      gmaScore,
+      riskFactor,
+      combinedScore,
+    };
+  } catch (error) {
+    console.error("Failed to upload results to database:", error);
+    throw error;
+  }
 };
 
 // Marketing Section Component
@@ -293,43 +336,43 @@ const PredictionProgress = ({
   progress: number;
   stage: string;
 }) => (
-    <>
-  <Card className="w-full max-w-2xl mx-auto">
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2 text-brand-dark">
-        <Brain className="w-6 h-6 animate-pulse" />
-        AI Analysis in Progress
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="space-y-4">
-        <Progress value={progress} className="w-full" />
-        <div className="flex justify-between text-sm text-muted-foreground">
-          <span>Processing...</span>
-          <span>{Math.round(progress)}%</span>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-brand-teal">
-          <Zap className="w-4 h-4 animate-pulse" />
-          {stage}
-        </div>
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Network className="w-4 h-4" />
-            GPU Clusters Active
+  <>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-brand-dark">
+          <Brain className="w-6 h-6 animate-pulse" />
+          AI Analysis in Progress
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <Progress value={progress} className="w-full" />
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Processing...</span>
+            <span>{Math.round(progress)}%</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Eye className="w-4 h-4" />
-            Computer Vision
+          <div className="flex items-center gap-2 text-sm text-brand-teal">
+            <Zap className="w-4 h-4 animate-pulse" />
+            {stage}
           </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Brain className="w-4 h-4" />
-            Deep Learning
+          <div className="grid grid-cols-3 gap-4 mt-6">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Network className="w-4 h-4" />
+              GPU Clusters Active
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Eye className="w-4 h-4" />
+              Computer Vision
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Brain className="w-4 h-4" />
+              Deep Learning
+            </div>
           </div>
         </div>
-      </div>
-    </CardContent>
-  </Card>
-  <TechnologyShowcase/>
+      </CardContent>
+    </Card>
+    <TechnologyShowcase />
   </>
 );
 
@@ -429,8 +472,9 @@ const ResultsDisplay = ({ results }: { results }) => {
               
               <div class="user-info">
                 <h3 style="margin-top: 0; color: #2D6B8A;">Report Details</h3>
-                <p><strong>Healthcare Provider:</strong> ${userName}</p>
-                <p><strong>Email:</strong> ${userEmail}</p>
+                <p><strong>Healthcare Provider:</strong> EarlySteps AI</p>
+                <p><strong>UserName:</strong> ${Cookies.get("userName")}</p>
+                <p><strong>Email:</strong> ${Cookies.get("token")}</p>
                 <p><strong>Generated:</strong> ${currentDate.toLocaleDateString(
                   "en-US",
                   {
@@ -440,9 +484,7 @@ const ResultsDisplay = ({ results }: { results }) => {
                     day: "numeric",
                   }
                 )} at ${currentDate.toLocaleTimeString("en-US")}</p>
-                <p><strong>Report ID:</strong> ES-${Date.now()
-                  .toString()
-                  .slice(-8)}</p>
+                <p><strong>Report ID:</strong> ES-${id}</p>
               </div>
 
               <div class="score-grid">
@@ -768,36 +810,36 @@ export default function AnalyzePage() {
 
           {step === "uploaded" && (
             <>
-            <Card className="w-full max-w-2xl mx-auto">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-brand-dark">
-                  <FileText className="w-6 h-6" />
-                  Ready for Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center space-y-4">
-                  <div className="p-4 bg-brand-light rounded-lg">
-                    <p className="font-semibold text-brand-dark">
-                      {selectedFile?.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Size:{" "}
-                      {((selectedFile?.size || 0) / (1024 * 1024)).toFixed(2)}{" "}
-                      MB
-                    </p>
+              <Card className="w-full max-w-2xl mx-auto">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-brand-dark">
+                    <FileText className="w-6 h-6" />
+                    Ready for Analysis
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center space-y-4">
+                    <div className="p-4 bg-brand-light rounded-lg">
+                      <p className="font-semibold text-brand-dark">
+                        {selectedFile?.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Size:{" "}
+                        {((selectedFile?.size || 0) / (1024 * 1024)).toFixed(2)}{" "}
+                        MB
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handlePrediction}
+                      className="bg-brand-teal hover:bg-brand-teal/90 text-white px-8 py-3 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    >
+                      <Brain className="w-5 h-5 mr-2" />
+                      Start AI Analysis
+                    </Button>
                   </div>
-                  <Button
-                    onClick={handlePrediction}
-                    className="bg-brand-teal hover:bg-brand-teal/90 text-white px-8 py-3 transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    <Brain className="w-5 h-5 mr-2" />
-                    Start AI Analysis
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-            <TechnologyShowcase/>
+                </CardContent>
+              </Card>
+              <TechnologyShowcase />
             </>
           )}
 
