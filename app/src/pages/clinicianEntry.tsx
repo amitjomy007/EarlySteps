@@ -776,9 +776,9 @@ export default function ClinicianAssessmentPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitProgress, setSubmitProgress] = useState(0);
-  const [clinicianName, setClinicianName] = useState("Dr. Sarah Johnson");
+  const [clinicianName, setClinicianName] = useState("Dr. Aswin Tony");
   const [clinicianEmail, setClinicianEmail] = useState(
-    "dr.sarah@earlysteps.ai"
+    "clinician@earlysteps.in"
   );
   const [notes, setNotes] = useState("");
 
@@ -815,9 +815,9 @@ export default function ClinicianAssessmentPage() {
 
       // Simulate patient data
       const mockPatient: Patient = {
-        id: "patient_12345",
-        userName: "Baby Smith",
-        userEmail: "parent@example.com",
+        id: "patient_GR5XXM",
+        userName: "Baby XYZ",
+        userEmail: "parent@earlysteps.m",
         dateOfBirth: "2024-01-15",
         guardianName: "John & Jane Smith",
         medicalRecordNumber: "MRN-789456",
